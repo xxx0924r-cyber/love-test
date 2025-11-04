@@ -3,144 +3,176 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Love Test</title>
+  <title>恋愛コアタイプ診断</title>
   <style>
-    body {
-      font-family: "Noto Sans JP", sans-serif;
-      background: #fff;
-      color: #333;
-      margin: 0;
-      padding: 20px;
-      text-align: center;
-    }
-    h2 { margin-top: 20px; }
-    .hidden { display: none; }
-    .q { margin: 30px 0; }
-    .hearts {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 10px;
-    }
-    svg {
-      width: 40px;
-      height: 40px;
-      cursor: pointer;
-      transition: transform .2s, fill .2s;
-    }
-    svg:hover { transform: scale(1.2); }
-    #bar {
-      width: 100%;
-      height: 6px;
-      background: #eee;
-      border-radius: 10px;
-      overflow: hidden;
-      margin-bottom: 10px;
-    }
-    #barFill {
-      height: 100%;
-      background: linear-gradient(90deg, #ff99cc, #66ccff);
-      width: 0%;
-      transition: width .3s;
-    }
+    :root{--pink:#fb6ea9;--teal:#22c3b9;--line:#e5e7eb;--text:#0f172a;--muted:#6b7280;}
+    *{box-sizing:border-box}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans JP",sans-serif;margin:0;background:#fafafa;color:var(--text)}
+    .wrap{max-width:880px;margin:24px auto;padding:0 18px 40px}
+    .card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 26px rgba(0,0,0,.05);padding:22px}
+    h1{margin:6px 0 4px;font-size:24px;text-align:center}
+    .muted{color:var(--muted);font-size:12px}
+    .hidden{display:none}
+    /* progress */
+    .progress{position:sticky;top:0;background:#fff;padding:10px 0;z-index:10;border-bottom:1px solid var(--line)}
+    .bar{height:8px;border-radius:999px;background:var(--line);overflow:hidden}
+    .bar>span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--teal));transition:width .25s ease}
+    /* questions */
+    .q{padding:22px 0;border-bottom:1px solid var(--line)}
+    .q:last-child{border-bottom:0}
+    .q h3{margin:0 0 10px;font-size:20px;text-align:center}
+    .heart-row{display:flex;gap:14px;justify-content:center;align-items:center;margin:14px 0}
+    .heart{width:38px;cursor:pointer;opacity:.9;transition:transform .12s ease, opacity .12s ease}
+    .heart.small{width:30px}
+    .heart:hover{transform:translateY(-2px);opacity:1}
+    .actions{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
+    button{background:#111;color:#fff;border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
+    /* result */
+    .result-title{font-size:22px;text-align:center;margin:6px 0 12px}
+    .tag{display:inline-block;background:#fde68a;border-radius:10px;padding:4px 10px;margin:4px 0}
+    .result-box{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fff}
+    .center{ text-align:center }
   </style>
 </head>
 <body>
-  <div id="bar"><div id="barFill"></div></div>
-  <div id="pctText">進捗 0%</div>
+  <!-- progress -->
+  <div class="progress">
+    <div class="wrap" style="padding-bottom:0">
+      <div class="muted" id="pctText">進捗 0%</div>
+      <div class="bar"><span id="barFill"></span></div>
+    </div>
+  </div>
 
-  <form id="quiz">
-    <div id="qWrap"></div>
-    <button type="submit">診断する</button>
-  </form>
+  <div class="wrap">
+    <!-- 質問カード -->
+    <section id="formCard" class="card">
+      <h1>恋愛コアタイプ診断 <span class="muted">（全7問・3分）</span></h1>
+      <p class="muted center">直感で選んでください。ハートをタップするだけ。</p>
+      <form id="quiz">
+        <div id="qWrap"></div>
+        <div class="actions">
+          <div class="muted">診断ID: <code>KM-01</code></div>
+          <button type="submit">結果を見る</button>
+        </div>
+      </form>
+    </section>
 
-  <div id="resultCard" class="hidden">
-    <h2>診断結果：</h2>
-    <p id="typeName"></p>
-    <button id="shareBtn">結果をシェア</button>
+    <!-- 結果カード（最初は非表示） -->
+    <section id="resultCard" class="card hidden">
+      <div class="muted">診断レポート / 2025</div>
+      <h2 class="result-title">あなたの将来の奥さんとしてぴったりなのは・・・</h2>
+      <div class="center"><span class="tag">玲華！</span></div>
+
+      <div class="result-box" style="margin-top:12px">
+        <ul style="margin:0;padding-left:18px;line-height:1.9">
+          <li>愛情深くていつもhappy</li>
+          <li>かまってあげないとたまに爆発・・・？</li>
+          <li>愛でてあげると分かりやすく上機嫌</li>
+          <li>りゅうくんのことがやけに好き</li>
+        </ul>
+      </div>
+
+      <p class="center" style="margin-top:14px;font-weight:700">コールマン 玲華</p>
+
+      <div class="center" style="margin-top:10px">
+        <button id="shareBtn">結果をシェア</button>
+        <button id="againBtn" style="margin-left:8px;background:#555">もう一度やる</button>
+      </div>
+    </section>
   </div>
 
   <script>
-    const FIXED_TYPE_NAME = "Kome（こめ）";
-
+    // 固定結果（どの回答でも同じ結果画面に遷移）
     const QUESTIONS = [
-      {text:'憧れやすい方だ', A:'はい', B:'いいえ'},
-      {text:'恋人がいる時は異性がいる場に行かないようにしている', A:'はい', B:'いいえ'},
-      {text:'相手のテンションに合わせるのが得意だ', A:'はい', B:'いいえ'},
-      {text:'連絡は安定している方が安心する', A:'はい', B:'いいえ'},
-      {text:'冗談で愛情を伝えるのが得意', A:'はい', B:'いいえ'},
-      {text:'価値観（金・生活・速度）が合うのが一番大事', A:'はい', B:'いいえ'}
+      {text:'憧れやすい方だ'},
+      {text:'恋人がいる時は異性がいる場に行かないようにしている'},
+      {text:'相手のテンポに合わせるのが得意だ'},
+      {text:'連絡は安定している方が安心する'},
+      {text:'冗談で愛情を伝えるのが得意'},
+      {text:'価値観（金・生活・速度）が合うのが一番大事'},
+      {text:'大人っぽい余裕に惹かれる'}
     ];
 
     const form = document.getElementById('quiz');
     const qWrap = document.getElementById('qWrap');
-    const resultCard = document.getElementById('resultCard');
     const formCard = document.getElementById('formCard');
-    const typeName = document.getElementById('typeName');
+    const resultCard = document.getElementById('resultCard');
     const shareBtn = document.getElementById('shareBtn');
+    const againBtn = document.getElementById('againBtn');
     const barFill = document.getElementById('barFill');
     const pctText = document.getElementById('pctText');
 
-    const heartSVG = (color) => `
+    // ハートSVG
+    const heart = (color) => `<?xml version="1.0"?>
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path fill="none" stroke="${color}" stroke-width="2"
-          d="M12 21s-6-4.4-6-9 2-8 6-8 6 3 6 8-6 9-6 9z"/>
+              d="M12 21s-6.7-4.6-9.2-8.1C1 10.2 1.5 7.2 3.7 5.8 5.8 4.3 8.5 4.9 10 6.9c1.5-2 4.2-2.6 6.3-1.1 2.2 1.4 2.7 4.4.9 7.1C18.7 16.3 12 21 12 21z"/>
       </svg>`;
 
     const answers = new Array(QUESTIONS.length).fill(null);
 
-    const renderQ = () => {
+    const render = () => {
       qWrap.innerHTML = '';
-      QUESTIONS.forEach((q, i) => {
-        const blk = document.createElement('div');
-        blk.className = 'q';
-        const h = document.createElement('h3');
-        h.textContent = q.text;
-        blk.appendChild(h);
+      QUESTIONS.forEach((q,i)=>{
+        const blk = document.createElement('div'); blk.className='q';
+        const h = document.createElement('h3'); h.textContent = q.text; blk.appendChild(h);
 
-        const hearts = document.createElement('div');
-        hearts.className = 'hearts';
-        const colors = ['#ff99cc', '#ffb3d9', '#ccc', '#99e6ff', '#66ccff'];
-        colors.forEach((c, k) => {
+        const row = document.createElement('div'); row.className='heart-row';
+        const palette = ['var(--pink)','var(--pink)','var(--muted)','var(--teal)','var(--teal)'];
+        for(let j=0;j<5;j++){
           const span = document.createElement('span');
-          span.innerHTML = heartSVG(c);
-          span.onclick = () => {
-            answers[i] = k;
-            updateProgress();
-          };
-          hearts.appendChild(span);
-        });
-        blk.appendChild(hearts);
+          span.className = 'heart'+(j===2?' small':'');
+          span.innerHTML = heart(getComputedStyle(document.documentElement).getPropertyValue(palette[j].replace('var(','').replace(')','')).trim() || palette[j]);
+          span.addEventListener('click',()=>{ answers[i]=j; updateProgress(); highlight(i); });
+          row.appendChild(span);
+        }
+        blk.appendChild(row);
         qWrap.appendChild(blk);
       });
     };
 
+    function highlight(idx){
+      const block = qWrap.querySelectorAll('.q')[idx];
+      const hearts = block.querySelectorAll('.heart');
+      hearts.forEach((h,k)=>{ h.style.transform = (answers[idx]===k)?'scale(1.1)':'none'; h.style.opacity = (answers[idx]===k)?'1':'.9'; });
+    }
+
     function updateProgress(){
-      const done = answers.filter(v => v !== null).length;
-      const pct = Math.round(done / answers.length * 100);
-      barFill.style.width = pct + '%';
+      const done = answers.filter(v=>v!==null).length;
+      const pct = Math.round(done/answers.length*100);
+      barFill.style.width = pct+'%';
       pctText.textContent = `進捗 ${pct}%`;
     }
 
-    renderQ();
-    updateProgress();
+    render(); updateProgress();
 
-    form.addEventListener('submit', (e) => {
+    // 送信で画面を切り替える
+    form.addEventListener('submit',(e)=>{
       e.preventDefault();
-      typeName.textContent = FIXED_TYPE_NAME;
-      resultCard.classList.remove('hidden');
-      window.scrollTo({top: 0, behavior: 'smooth'});
+      formCard.classList.add('hidden');        // 設問カードを隠す
+      resultCard.classList.remove('hidden');   // 結果カードを表示
+      window.scrollTo({top:0,behavior:'smooth'});
     });
 
-    shareBtn.addEventListener('click', async () => {
-      const text = '診断終わったよ！結果：Kome（こめ）';
-      try {
+    // シェア（メッセ文コピー）
+    shareBtn.addEventListener('click', async ()=>{
+      const text = '診断終わったよ！\\n将来の奥さんは「玲華」らしい🤣';
+      try{
         await navigator.clipboard.writeText(text);
-        shareBtn.textContent = 'コピーしました！スクショお願い！';
-        setTimeout(() => shareBtn.textContent = '結果をシェア', 2500);
-      } catch {
+        shareBtn.textContent = 'コピーしたよ（スクショも送って！）';
+        setTimeout(()=> shareBtn.textContent='結果をシェア', 2200);
+      }catch{
         alert('結果画面をスクショして送ってね！');
       }
+    });
+
+    // もう一度やる
+    againBtn.addEventListener('click', ()=>{
+      answers.fill(null);
+      render(); updateProgress();
+      resultCard.classList.add('hidden');
+      formCard.classList.remove('hidden');
+      window.scrollTo({top:0,behavior:'smooth'});
     });
   </script>
 </body>
