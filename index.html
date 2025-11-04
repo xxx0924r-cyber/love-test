@@ -1,57 +1,73 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>恋愛コアタイプ診断</title>
   <style>
-    :root{--pink:#fb6ea9;--teal:#22c3b9;--line:#e5e7eb;--text:#0f172a;--muted:#6b7280;}
+    :root{
+      --pink:#fb6ea9; --teal:#22c3b9; --line:#e5e7eb; --text:#0f172a; --muted:#6b7280;
+    }
     *{box-sizing:border-box}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans JP",sans-serif;margin:0;background:#fafafa;color:var(--text)}
+    body{
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans JP",sans-serif;
+      margin:0; background:#fafafa; color:var(--text);
+    }
     .wrap{max-width:880px;margin:24px auto;padding:0 18px 40px}
     .card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 26px rgba(0,0,0,.05);padding:22px}
     h1{margin:6px 0 4px;font-size:24px;text-align:center}
     .muted{color:var(--muted);font-size:12px}
+    .center{text-align:center}
     .hidden{display:none}
+
     /* progress */
     .progress{position:sticky;top:0;background:#fff;padding:10px 0;z-index:10;border-bottom:1px solid var(--line)}
     .bar{height:8px;border-radius:999px;background:var(--line);overflow:hidden}
     .bar>span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--teal));transition:width .25s ease}
+
     /* questions */
     .q{padding:22px 0;border-bottom:1px solid var(--line)}
     .q:last-child{border-bottom:0}
-    .q h3{margin:0 0 10px;font-size:20px;text-align:center}
-    .heart-row{display:flex;gap:14px;justify-content:center;align-items:center;margin:14px 0}
-    .heart{width:38px;cursor:pointer;opacity:.9;transition:transform .12s ease, opacity .12s ease}
-    /* ハート選択時のエフェクト */
-input[type="radio"]:checked + svg {
-  fill: var(--pink);
-  transform: scale(1.2);
-  opacity: 1;
-  transition: all 0.2s ease;
-}
+    .q h3{margin:0 0 12px;font-size:20px;text-align:center}
 
-/* 未選択のハートは薄く */
-.heart svg {
-  opacity: 0.4;
-  transition: all 0.2s ease;
-}
+    /* ラベル＋ハートの並び */
+    .scale-row{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:24px;
+      margin:10px 0 25px;
+      flex-wrap:wrap;
+    }
+    .scale-label{
+      font-size:13px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .heart-row{
+      display:flex;
+      gap:14px;
+      justify-content:center;
+      align-items:center;
+    }
 
-/* ホバー時にふわっと強調 */
-.heart:hover svg {
-  opacity: 0.8;
-  transform: scale(1.1);
-}
-
+    .heart{width:38px;cursor:pointer;transition:transform .12s ease, opacity .12s ease}
     .heart.small{width:30px}
-    .heart:hover{transform:translateY(-2px);opacity:1}
+
+    /* 既定は薄く */
+    .heart svg{opacity:.4;transition:all .2s ease}
+    .heart:hover svg{opacity:.8;transform:scale(1.1)}
+    /* 選択時の強調（JSで class="on" を付与） */
+    .heart.on svg{fill:var(--pink);opacity:1;transform:scale(1.2)}
+
+    /* actions / buttons */
     .actions{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
     button{background:#111;color:#fff;border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
+
     /* result */
     .result-title{font-size:22px;text-align:center;margin:6px 0 12px}
     .tag{display:inline-block;background:#fde68a;border-radius:10px;padding:4px 10px;margin:4px 0}
     .result-box{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fff}
-    .center{ text-align:center }
   </style>
 </head>
 <body>
@@ -77,7 +93,7 @@ input[type="radio"]:checked + svg {
       </form>
     </section>
 
-    <!-- 結果カード（最初は非表示） -->
+    <!-- 結果カード -->
     <section id="resultCard" class="card hidden">
       <div class="muted">診断レポート / 2025</div>
       <h2 class="result-title">あなたの将来の奥さんとしてぴったりなのは・・・</h2>
@@ -92,9 +108,10 @@ input[type="radio"]:checked + svg {
         </ul>
       </div>
 
-      <p class="center" style="margin-top:14px;font-weight:700">コールマン 玲華<br>どう？？</p>
-
+      <!-- 診断画像（アップ済み: IMG_5863.jpg） -->
       <img src="IMG_5863.jpg" alt="診断結果の画像" style="width:100%;border-radius:14px;margin:20px 0;">
+
+      <p class="center" style="margin-top:14px;font-weight:700">コールマン 玲華<br>どう？？</p>
 
       <div class="center" style="margin-top:10px">
         <button id="shareBtn">結果をシェア</button>
@@ -104,19 +121,16 @@ input[type="radio"]:checked + svg {
   </div>
 
   <script>
-    // 固定結果（どの回答でも同じ結果画面に遷移）
-  const QUESTIONS = [
-  { text: '恋愛では自分から追うことが多い' },
-  { text: '相手の既読や予定はできるだけ把握したい' },
-  { text: '連絡は毎日でも平気（むしろ安心する）' },
-  { text: 'ケンカ後は自分から歩み寄ることが多い' },
-  { text: '相手が異性と2人で出かけるのは基本NGだ' },
-  { text: 'スキンシップや言葉での愛情表現は多い方がいい' },
-  { text: '仕事や趣味の時間は互いに干渉したくない' },
-  { text: 'サプライズより安定した日常の方が好き' },
-  { text: '価値観（お金・生活リズム）が合えば長続きすると思う' },
-  { text: 'デートは自分がリードする方がラク' }
-];
+    // 設問（精度上げ版）
+    const QUESTIONS = [
+      { text: '恋愛では自分から追うことが多い' },
+      { text: '相手の既読や予定はできるだけ把握したい' },
+      { text: '連絡は毎日でも平気（むしろ安心する）' },
+      { text: 'ケンカ後は自分から歩み寄ることが多い' },
+      { text: '相手が異性と2人で出かけるのは基本NGだ' },
+      { text: 'スキンシップや言葉での愛情表現は多い方がいい' },
+      { text: 'サプライズより安定した日常の方が好き' }
+    ];
 
     const form = document.getElementById('quiz');
     const qWrap = document.getElementById('qWrap');
@@ -127,63 +141,73 @@ input[type="radio"]:checked + svg {
     const barFill = document.getElementById('barFill');
     const pctText = document.getElementById('pctText');
 
-    // ハートSVG
-    const heart = (color) => `<?xml version="1.0"?>
+    // ハートSVG（色はCSSで塗るので線のみ）
+    const heart = (stroke) => `
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path fill="none" stroke="${color}" stroke-width="2"
-              d="M12 21s-6.7-4.6-9.2-8.1C1 10.2 1.5 7.2 3.7 5.8 5.8 4.3 8.5 4.9 10 6.9c1.5-2 4.2-2.6 6.3-1.1 2.2 1.4 2.7 4.4.9 7.1C18.7 16.3 12 21 12 21z"/>
-      </svg>`;
+        <path fill="none" stroke="${stroke}" stroke-width="2"
+          d="M12 21s-6.7-4.6-9.2-8.1C1 10.2 1.5 7.2 3.7 5.8c2.1-1.5 4.8-.9 6.3 1.1 1.5-2 4.2-2.6 6.3-1.1 2.2 1.4 2.7 4.4.9 7.1C18.7 16.3 12 21 12 21z"/>
+      </svg>
+    `;
 
     const answers = new Array(QUESTIONS.length).fill(null);
 
+    // 描画
     const render = () => {
- qWrap.innerHTML = "";
-QUESTIONS.forEach((q,i)=>{
-  const blk = document.createElement('div'); blk.className='q';
-  const h = document.createElement('h3'); h.textContent = q.text; blk.appendChild(h);
+      qWrap.innerHTML = "";
+      QUESTIONS.forEach((q,i)=>{
+        const blk = document.createElement('div'); blk.className='q';
+        const h = document.createElement('h3'); h.textContent = q.text; blk.appendChild(h);
 
-  // ラベル＋ハート列を横並びにする親
-  const scaleRow = document.createElement('div'); scaleRow.className = 'scale-row';
+        // 横並びコンテナ
+        const scaleRow = document.createElement('div'); scaleRow.className = 'scale-row';
 
-  // 左ラベル
-  const leftLabel = document.createElement('div');
-  leftLabel.className = 'scale-label';
-  leftLabel.textContent = 'とてもそう思う';
+        // 左ラベル
+        const leftLabel = document.createElement('div');
+        leftLabel.className = 'scale-label';
+        leftLabel.textContent = 'とてもそう思う';
 
-  // ハート列
-  const heartRow = document.createElement('div'); heartRow.className = 'heart-row';
-  const palette = ['var(--pink)','var(--pink)','var(--muted)','var(--teal)','var(--teal)'];
-  for(let j=0;j<5;j++){
-    const span = document.createElement('span');
-    span.className = 'heart'+(j===2?' small':'');
-    span.innerHTML = heart(getComputedStyle(document.documentElement).getPropertyValue(
-      palette[j].replace('var(','').replace(')','')
-    ).trim() || palette[j]);
-    span.addEventListener('click',()=>{ answers[i]=j; updateProgress(); highlight(i); });
-    heartRow.appendChild(span);
-  }
+        // ハート群
+        const heartRow = document.createElement('div'); heartRow.className = 'heart-row';
+        const palette = ['var(--pink)','var(--pink)','var(--muted)','var(--teal)','var(--teal)'];
+        for(let j=0;j<5;j++){
+          const span = document.createElement('span');
+          span.className = 'heart'+(j===2?' small':'');
+          const color = getComputedStyle(document.documentElement)
+            .getPropertyValue(palette[j].replace('var(','').replace(')','')).trim() || '#ccc';
+          span.innerHTML = heart(color);
+          span.addEventListener('click',()=>{
+            answers[i]=j;
+            updateProgress();
+            highlight(i);
+          });
+          heartRow.appendChild(span);
+        }
 
-  // 右ラベル
-  const rightLabel = document.createElement('div');
-  rightLabel.className = 'scale-label';
-  rightLabel.textContent = 'まったくそう思わない';
+        // 右ラベル
+        const rightLabel = document.createElement('div');
+        rightLabel.className = 'scale-label';
+        rightLabel.textContent = 'まったくそう思わない';
 
-  // 並べて追加
-  scaleRow.appendChild(leftLabel);
-  scaleRow.appendChild(heartRow);
-  scaleRow.appendChild(rightLabel);
-  blk.appendChild(scaleRow);
+        scaleRow.appendChild(leftLabel);
+        scaleRow.appendChild(heartRow);
+        scaleRow.appendChild(rightLabel);
+        blk.appendChild(scaleRow);
 
-  qWrap.appendChild(blk);
-});
+        qWrap.appendChild(blk);
+      });
     };
 
+    // 選択中のハートだけ強調
     function highlight(idx){
       const block = qWrap.querySelectorAll('.q')[idx];
       const hearts = block.querySelectorAll('.heart');
-      hearts.forEach((h,k)=>{ h.style.transform = (answers[idx]===k)?'scale(1.1)':'none'; h.style.opacity = (answers[idx]===k)?'1':'.9'; });
+      hearts.forEach((h,k)=>{
+        if(answers[idx]===k){ h.classList.add('on'); }
+        else{ h.classList.remove('on'); }
+      });
     }
 
+    // 進捗バー
     function updateProgress(){
       const done = answers.filter(v=>v!==null).length;
       const pct = Math.round(done/answers.length*100);
@@ -193,17 +217,17 @@ QUESTIONS.forEach((q,i)=>{
 
     render(); updateProgress();
 
-    // 送信で画面を切り替える
+    // 送信→結果カードに切替
     form.addEventListener('submit',(e)=>{
       e.preventDefault();
-      formCard.classList.add('hidden');        // 設問カードを隠す
-      resultCard.classList.remove('hidden');   // 結果カードを表示
+      formCard.classList.add('hidden');
+      resultCard.classList.remove('hidden');
       window.scrollTo({top:0,behavior:'smooth'});
     });
 
     // シェア（メッセ文コピー）
     shareBtn.addEventListener('click', async ()=>{
-      const text = '診断終わったよ！\\n将来の奥さんは「玲華」らしい🤣';
+      const text = '診断終わったよ！将来の奥さんは「玲華」らしい🤣';
       try{
         await navigator.clipboard.writeText(text);
         shareBtn.textContent = 'コピーしたよ（スクショも送って！）';
@@ -213,7 +237,7 @@ QUESTIONS.forEach((q,i)=>{
       }
     });
 
-    // もう一度やる
+    // もう一度
     againBtn.addEventListener('click', ()=>{
       answers.fill(null);
       render(); updateProgress();
