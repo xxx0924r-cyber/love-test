@@ -1,0 +1,87 @@
+<!doctype html>
+},
+{
+text: '相手に求める“芯”は？',
+options: ['誠実さ', 'センス', '仕事への本気度']
+},
+{
+text: 'ケンカになったら？',
+options: ['その場で話して収束', '一旦クールダウンして再開', '冗談で溶かす']
+},
+{
+text: '長続きの鍵は？',
+options: ['連絡の安定感', '適度なスリル', '価値観の合致（金・生活感・速度）']
+}
+];
+
+
+const qWrap = document.getElementById('qWrap');
+const form = document.getElementById('quiz');
+const resultCard = document.getElementById('resultCard');
+const formCard = document.getElementById('formCard');
+const typeName = document.getElementById('typeName');
+const shareBtn = document.getElementById('shareBtn');
+
+
+// 質問を描画
+QUESTIONS.forEach((q, i) => {
+const field = document.createElement('fieldset');
+field.className = 'rounded-xl border border-slate-200 p-4';
+const legend = document.createElement('legend');
+legend.className = 'font-semibold';
+legend.textContent = `Q${i+1}. ${q.text}`;
+field.appendChild(legend);
+
+
+const opts = document.createElement('div');
+opts.className = 'mt-3 grid gap-2';
+
+
+q.options.forEach((opt, j) => {
+const id = `q${i}_opt${j}`;
+const label = document.createElement('label');
+label.setAttribute('for', id);
+label.className = 'flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:border-slate-300 cursor-pointer';
+const input = document.createElement('input');
+input.type = 'radio';
+input.name = `q${i}`;
+input.id = id;
+input.value = j + 1;
+input.className = 'mt-1';
+const span = document.createElement('span');
+span.textContent = opt;
+label.appendChild(input);
+label.appendChild(span);
+opts.appendChild(label);
+});
+
+
+field.appendChild(opts);
+qWrap.appendChild(field);
+});
+
+
+form.addEventListener('submit', (e) => {
+e.preventDefault();
+// 入力バリデーション（未選択があっても通す：診断を軽く見せたい）
+typeName.textContent = FIXED_TYPE_NAME; // どの回答でも固定結果
+formCard.classList.add('hidden');
+resultCard.classList.remove('hidden');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+
+shareBtn.addEventListener('click', async () => {
+// クリップボードにメッセージをコピー（スクショ依頼を自然に）
+const text = '診断終わったよ！結果：Kome（こめ）\nスクショ送るね📸';
+try {
+await navigator.clipboard.writeText(text);
+shareBtn.textContent = 'コピーしました。スクショお願い！';
+setTimeout(()=> shareBtn.textContent='結果をスクショして送ってね', 2500);
+} catch (_) {
+alert('結果画面をスクショして送ってね！');
+}
+});
+</script>
+</body>
+</html>
