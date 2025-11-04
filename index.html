@@ -137,23 +137,45 @@ input[type="radio"]:checked + svg {
     const answers = new Array(QUESTIONS.length).fill(null);
 
     const render = () => {
-      qWrap.innerHTML = '';
-      QUESTIONS.forEach((q,i)=>{
-        const blk = document.createElement('div'); blk.className='q';
-        const h = document.createElement('h3'); h.textContent = q.text; blk.appendChild(h);
+ qWrap.innerHTML = "";
+QUESTIONS.forEach((q,i)=>{
+  const blk = document.createElement('div'); blk.className='q';
+  const h = document.createElement('h3'); h.textContent = q.text; blk.appendChild(h);
 
-        const row = document.createElement('div'); row.className='heart-row';
-        const palette = ['var(--pink)','var(--pink)','var(--muted)','var(--teal)','var(--teal)'];
-        for(let j=0;j<5;j++){
-          const span = document.createElement('span');
-          span.className = 'heart'+(j===2?' small':'');
-          span.innerHTML = heart(getComputedStyle(document.documentElement).getPropertyValue(palette[j].replace('var(','').replace(')','')).trim() || palette[j]);
-          span.addEventListener('click',()=>{ answers[i]=j; updateProgress(); highlight(i); });
-          row.appendChild(span);
-        }
-        blk.appendChild(row);
-        qWrap.appendChild(blk);
-      });
+  // ラベル＋ハート列を横並びにする親
+  const scaleRow = document.createElement('div'); scaleRow.className = 'scale-row';
+
+  // 左ラベル
+  const leftLabel = document.createElement('div');
+  leftLabel.className = 'scale-label';
+  leftLabel.textContent = 'とてもそう思う';
+
+  // ハート列
+  const heartRow = document.createElement('div'); heartRow.className = 'heart-row';
+  const palette = ['var(--pink)','var(--pink)','var(--muted)','var(--teal)','var(--teal)'];
+  for(let j=0;j<5;j++){
+    const span = document.createElement('span');
+    span.className = 'heart'+(j===2?' small':'');
+    span.innerHTML = heart(getComputedStyle(document.documentElement).getPropertyValue(
+      palette[j].replace('var(','').replace(')','')
+    ).trim() || palette[j]);
+    span.addEventListener('click',()=>{ answers[i]=j; updateProgress(); highlight(i); });
+    heartRow.appendChild(span);
+  }
+
+  // 右ラベル
+  const rightLabel = document.createElement('div');
+  rightLabel.className = 'scale-label';
+  rightLabel.textContent = 'まったくそう思わない';
+
+  // 並べて追加
+  scaleRow.appendChild(leftLabel);
+  scaleRow.appendChild(heartRow);
+  scaleRow.appendChild(rightLabel);
+  blk.appendChild(scaleRow);
+
+  qWrap.appendChild(blk);
+});
     };
 
     function highlight(idx){
