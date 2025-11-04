@@ -5,378 +5,252 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>恋愛コアタイプ診断</title>
   <style>
-    :root{
-      --pink:#fb6ea9; --teal:#22c3b9; --line:#e5e7eb; --text:#0f172a; --muted:#6b7280;
+    :root {
+      --pink:#fb6ea9;
+      --teal:#22c3b9;
+      --line:#e5e7eb;
+      --text:#0f172a;
+      --muted:#6b7280;
     }
-    *{box-sizing:border-box}
-    body{
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans JP",sans-serif;
-      margin:0; background:#fafafa; color:var(--text);
+    * { box-sizing:border-box; }
+    body {
+      font-family: "Noto Sans JP", sans-serif;
+      background:#fafafa;
+      color:var(--text);
+      margin:0;
     }
-    .wrap{max-width:880px;margin:24px auto;padding:0 18px 40px}
-    .card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 26px rgba(0,0,0,.05);padding:22px}
-    h1{margin:6px 0 4px;font-size:24px;text-align:center}
-    .muted{color:var(--muted);font-size:12px}
-    .center{text-align:center}
-    .hidden{display:none}
+    .wrap {
+      max-width:880px;
+      margin:24px auto;
+      padding:0 18px 40px;
+    }
+    .card {
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:16px;
+      box-shadow:0 8px 26px rgba(0,0,0,0.05);
+      padding:28px;
+    }
+    h1 { font-size:24px; text-align:center; margin-bottom:8px; }
+    .muted { color:var(--muted); font-size:13px; text-align:center; }
+    .progress {
+      position:sticky;top:0;
+      height:8px;
+      background:var(--line);
+      border-bottom:1px solid var(--line);
+      z-index:10;
+    }
+    .bar {
+      height:100%;
+      background:linear-gradient(90deg,var(--pink),var(--teal));
+      width:0%;
+      transition:width .3s ease;
+    }
 
-    /* progress */
-    .progress{position:sticky;top:0;background:#fff;padding:10px 0;z-index:10;border-bottom:1px solid var(--line)}
-    .bar{height:8px;border-radius:999px;background:var(--line);overflow:hidden}
-    .bar>span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--teal));transition:width .25s ease}
-
-    /* questions */
-    .q{padding:22px 0;border-bottom:1px solid var(--line)}
-    .q:last-child{border-bottom:0}
-    .q h3{margin:0 0 12px;font-size:20px;text-align:center}
-
-    /* ラベル＋ハートの並び */
-    .scale-row{
-      display:flex;
+    /* 質問 */
+    .q { padding:22px 0; border-bottom:1px solid var(--line); }
+    .q:last-child { border-bottom:0; }
+    .q h3 { text-align:center; font-size:18px; margin-bottom:8px; }
+    .scale-row {
+      display:grid;
+      grid-template-columns: auto 1fr auto;
       align-items:center;
-      justify-content:center;
-      gap:24px;
-      margin:10px 0 25px;
-      flex-wrap:wrap;
+      margin:8px 0 22px;
+      column-gap:10px;
     }
-    .scale-label{
+    .scale-label {
       font-size:13px;
       color:var(--muted);
       white-space:nowrap;
     }
-    .heart-row{
+    .heart-row {
       display:flex;
-      gap:14px;
       justify-content:center;
-      align-items:center;
+      gap:10px;
     }
+    .heart {
+      width:38px;
+      cursor:pointer;
+      transition:transform .15s ease, opacity .15s ease;
+    }
+    .heart:hover { transform:scale(1.1); opacity:0.9; }
+    .actions {
+      display:flex;
+      justify-content:center;
+      margin-top:18px;
+    }
+    button {
+      background:#ff8fab;
+      border:none;
+      padding:10px 18px;
+      border-radius:30px;
+      color:#fff;
+      cursor:pointer;
+      font-weight:bold;
+      transition:background 0.3s ease;
+    }
+    button:hover { background:#ff5f87; }
 
-    .heart{width:38px;cursor:pointer;transition:transform .12s ease, opacity .12s ease}
-    .heart.small{width:30px}
+    /* 結果カード */
+    .hidden { display:none; }
+    .result-card {
+      background:rgba(255,255,255,0.9);
+      backdrop-filter:blur(10px);
+      border-radius:20px;
+      padding:28px;
+      box-shadow:0 8px 25px rgba(0,0,0,0.08);
+      text-align:center;
+      margin-top:30px;
+    }
+    .result-header h2 { font-size:20px; margin-bottom:8px; }
+    .result-tag {
+      display:inline-block;
+      background:linear-gradient(90deg,#ffb6c1,#ffd700);
+      color:#fff;
+      font-weight:bold;
+      padding:6px 16px;
+      border-radius:50px;
+      font-size:14px;
+      margin-bottom:12px;
+    }
+    .result-list {
+      background:#fff;
+      border:1px solid #eee;
+      border-radius:12px;
+      padding:16px 20px;
+      margin:18px 0;
+      text-align:left;
+      list-style-type:"💗 ";
+    }
+    .result-image img {
+      width:100%;
+      border-radius:16px;
+      margin:18px 0;
+      box-shadow:0 6px 18px rgba(0,0,0,0.1);
+    }
+    .result-name {
+      font-weight:bold;
+      font-size:16px;
+      margin-top:8px;
+    }
+    .result-text { margin-bottom:14px; }
 
-    /* 既定は薄く */
-    .heart svg{opacity:.4;transition:all .2s ease}
-    .heart:hover svg{opacity:.8;transform:scale(1.1)}
-    /* 選択時の強調（JSで class="on" を付与） */
-    .heart.on svg{fill:var(--pink);opacity:1;transform:scale(1.2)}
-
-    /* actions / buttons */
-    .actions{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
-    button{background:#111;color:#fff;border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
-
-    /* result */
-    .result-title{font-size:22px;text-align:center;margin:6px 0 12px}
-    .tag{display:inline-block;background:#fde68a;border-radius:10px;padding:4px 10px;margin:4px 0}
-    .result-box{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fff}
-    /* ------ SP用レイアウト修正 ------ */
-@media (max-width: 480px) {
-  /* 左ラベル | ハート | 右ラベル を3カラムで固定 */
-  .scale-row{
-    display: grid !important;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    column-gap: 10px;
-    margin: 6px 0 18px;
-  }
-  .scale-label{
-    font-size: 12px;
-    color: var(--muted);
-    white-space: nowrap;   /* 折り返し防止 */
-  }
-  /* ハートを少し小さくして幅に収める */
-  .heart{ width: 28px; }
-  .heart.small{ width: 22px; }
-}
-
-/* さらに狭い端末向けの微調整 */
-@media (max-width: 360px) {
-  .heart{ width: 24px; }
-  .heart.small{ width: 20px; }
-  .scale-label{ font-size: 11px; }
-}
-/* 結果ページデザイン */
-.result-card {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(12px);
-  border-radius: 20px;
-  padding: 28px 24px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-  text-align: center;
-  margin: 30px auto;
-  max-width: 600px;
-}
-
-.result-header h2 {
-  font-size: 20px;
-  margin-bottom: 6px;
-  color: #333;
-}
-
-.result-tag {
-  display: inline-block;
-  background: linear-gradient(90deg, #ffb6c1, #ffd700);
-  color: #fff;
-  font-weight: bold;
-  padding: 6px 16px;
-  border-radius: 50px;
-  font-size: 14px;
-  margin-bottom: 14px;
-}
-
-.result-list {
-  background: #fff;
-  border: 1px solid #eee;
-  border-radius: 10px;
-  padding: 16px 20px;
-  margin: 18px 0;
-  text-align: left;
-  list-style-type: "💗 ";
-}
-
-.result-image img {
-  width: 100%;
-  border-radius: 16px;
-  margin: 18px 0;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
-}
-
-.result-name {
-  font-weight: bold;
-  margin-top: 6px;
-  font-size: 16px;
-}
-
-.result-text {
-  font-size: 15px;
-  color: #444;
-  margin-bottom: 14px;
-}
-
-.buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-button {
-  background: #ff8fab;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 30px;
-  color: #fff;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background 0.3s ease;
-}
-
-button:hover {
-  background: #ff5f87;
-}
-
+    /* SP調整 */
+    @media (max-width:480px){
+      .scale-label{font-size:12px;}
+      .heart{width:30px;}
+      .heart.small{width:24px;}
+    }
   </style>
 </head>
 <body>
-  <img src="ChatGPT Image 2025年11月5日 00_16_31.png" alt="恋愛コアタイプ診断バナー" style="width:100%;border-radius:12px;margin-bottom:20px;">
+<div class="wrap">
+  <div class="progress"><div id="barFill" class="bar"></div></div>
 
-  <!-- progress -->
-  <div class="progress">
-    <div class="wrap" style="padding-bottom:0">
-      <div class="muted" id="pctText">進捗 0%</div>
-      <div class="bar"><span id="barFill"></span></div>
+  <section id="formCard" class="card">
+    <h1>恋愛コアタイプ診断 <span class="muted">（全7問・3分）</span></h1>
+    <p class="muted">直感で選んでください。ハートをタップするだけ。</p>
+    <form id="quiz"></form>
+    <div class="actions"><button id="submitBtn">結果を見る</button></div>
+  </section>
+
+  <section id="resultCard" class="result-card hidden">
+    <div class="result-header">
+      <h2>あなたの将来の奥さんとしてぴったりなのは・・・</h2>
+      <span class="result-tag">玲華 💛</span>
     </div>
-  </div>
-
-  <div class="wrap">
-    <!-- 質問カード -->
-    <section id="formCard" class="card">
-      <h1>恋愛コアタイプ診断 <span class="muted">（全7問）</span></h1>
-      <p class="muted center">直感で選んでください。ハートをタップするだけ。</p>
-      <form id="quiz">
-        <div id="qWrap"></div>
-        <div class="actions">
-          <div class="muted">診断ID: <code>KM-01</code></div>
-          <button type="submit">結果を見る</button>
-        </div>
-      </form>
-    </section>
-
-    <!-- 結果カード -->
-    <section id="resultCard" class="result-card hidden">
-  <div class="result-header">
-    <h2>あなたの将来の奥さんとしてぴったりなのは・・・</h2>
-    <span class="result-tag">玲華 💛</span>
-  </div>
-
-  <ul class="result-list">
-    <li>愛情深くていつもhappy</li>
-    <li>かまってあげないとたまに爆発・・・？</li>
-    <li>愛でてあげると分かりやすく上機嫌</li>
-    <li>りゅうくんのことがやけに好き</li>
-  </ul>
-
-  <div class="result-image">
-    <img src="IMG_5863.jpg" alt="診断結果の画像">
-  </div>
-
-  <div class="result-footer">
+    <ul class="result-list">
+      <li>愛情深くていつもhappy</li>
+      <li>かまってあげないとたまに爆発・・・？</li>
+      <li>愛でてあげると分かりやすく上機嫌</li>
+      <li>りゅうくんのことがやけに好き</li>
+    </ul>
+    <div class="result-image">
+      <img src="IMG_5863.jpg" alt="診断結果の画像">
+    </div>
     <p class="result-name">コールマン 玲華</p>
     <p class="result-text">どう？？</p>
-    <div class="buttons">
+    <div class="actions">
       <button id="shareBtn">結果をシェア</button>
       <button id="againBtn">もう一度やる</button>
     </div>
-  </div>
-</section>
-      <div class="muted">診断レポート / 2025</div>
-      <h2 class="result-title">あなたの将来の奥さんとしてぴったりなのは・・・</h2>
-      <div class="center"><span class="tag">玲華！</span></div>
+  </section>
+</div>
 
-      <div class="result-box" style="margin-top:12px">
-        <ul style="margin:0;padding-left:18px;line-height:1.9">
-          <li>愛情深くていつもhappy</li>
-          <li>かまってあげないとたまに爆発・・・？</li>
-          <li>愛でてあげると分かりやすく上機嫌</li>
-          <li>りゅうくんのことがやけに好き</li>
-        </ul>
+<script>
+const QUESTIONS = [
+  {text:'恋愛では自分から追うことが多い'},
+  {text:'相手の既読や予定はできるだけ把握したい'},
+  {text:'連絡は毎日でも平気（むしろ安心する）'},
+  {text:'ケンカ後は自分から歩み寄ることが多い'},
+  {text:'相手が異性と2人で出かけるのは基本NGだ'},
+  {text:'スキンシップや言葉での愛情表現は多い方がいい'},
+  {text:'サプライズより安定した日常の方が好き'},
+];
+
+const quiz = document.getElementById('quiz');
+const bar = document.getElementById('barFill');
+const formCard = document.getElementById('formCard');
+const resultCard = document.getElementById('resultCard');
+const shareBtn = document.getElementById('shareBtn');
+const againBtn = document.getElementById('againBtn');
+
+let answers = new Array(QUESTIONS.length).fill(null);
+
+QUESTIONS.forEach((q,i)=>{
+  const blk=document.createElement('div');
+  blk.className='q';
+  blk.innerHTML=`
+    <h3>${q.text}</h3>
+    <div class="scale-row">
+      <span class="scale-label">とてもそう思う</span>
+      <div class="heart-row">
+        ${[1,2,3,4,5].map(j=>
+          `<span class="heart" data-q="${i}" data-v="${j}">
+             <svg viewBox="0 0 24 24" fill="none" stroke="${j<=3?'#fb6ea9':'#22c3b9'}" stroke-width="2">
+               <path d="M12 21s-6.9-5.7-9-9.1C1 8.5 2.9 4.2 6.5 4.1c1.9 0 3.4 1.2 4.2 2.7.8-1.5 2.3-2.7 4.2-2.7 3.6.1 5.5 4.4 3.5 7.8C18.9 15.3 12 21 12 21z"/>
+             </svg>
+           </span>`).join('')}
       </div>
+      <span class="scale-label">まったくそう思わない</span>
+    </div>`;
+  quiz.appendChild(blk);
+});
 
-      <!-- 診断画像（アップ済み: IMG_5863.jpg） -->
-      <img src="IMG_5863.jpg" alt="診断結果の画像" style="width:100%;border-radius:14px;margin:20px 0;">
+document.querySelectorAll('.heart').forEach(h=>{
+  h.addEventListener('click',()=>{
+    const q = h.dataset.q;
+    answers[q] = h.dataset.v;
+    updateProgress();
+  });
+});
 
-      <p class="center" style="margin-top:14px;font-weight:700">コールマン 玲華<br>どう？？</p>
+function updateProgress(){
+  const done = answers.filter(v=>v!=null).length;
+  const pct = Math.round(done / answers.length * 100);
+  bar.style.width = pct + '%';
+}
 
-      <div class="center" style="margin-top:10px">
-        <button id="shareBtn">結果をシェア</button>
-        <button id="againBtn" style="margin-left:8px;background:#555">もう一度やる</button>
-      </div>
-    </section>
-  </div>
+document.getElementById('submitBtn').addEventListener('click',(e)=>{
+  e.preventDefault();
+  formCard.classList.add('hidden');
+  resultCard.classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+});
 
-  <script>
-    // 設問（精度上げ版）
-    const QUESTIONS = [
-      { text: '恋愛では自分から追うことが多い' },
-      { text: '相手の既読や予定はできるだけ把握したい' },
-      { text: '連絡は毎日でも平気（むしろ安心する）' },
-      { text: 'ケンカ後は自分から歩み寄ることが多い' },
-      { text: '相手が異性と2人で出かけるのは基本NGだ' },
-      { text: 'スキンシップや言葉での愛情表現は多い方がいい' },
-      { text: 'サプライズより安定した日常の方が好き' }
-    ];
+shareBtn.addEventListener('click', async ()=>{
+  const text = '診断が終わったよ！結果：コールマン玲華💛';
+  try {
+    await navigator.clipboard.writeText(text);
+    alert('結果をコピーしました！');
+  } catch {
+    alert('コピーに失敗しました');
+  }
+});
 
-    const form = document.getElementById('quiz');
-    const qWrap = document.getElementById('qWrap');
-    const formCard = document.getElementById('formCard');
-    const resultCard = document.getElementById('resultCard');
-    const shareBtn = document.getElementById('shareBtn');
-    const againBtn = document.getElementById('againBtn');
-    const barFill = document.getElementById('barFill');
-    const pctText = document.getElementById('pctText');
-
-    // ハートSVG（色はCSSで塗るので線のみ）
-    const heart = (stroke) => `
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path fill="none" stroke="${stroke}" stroke-width="2"
-          d="M12 21s-6.7-4.6-9.2-8.1C1 10.2 1.5 7.2 3.7 5.8c2.1-1.5 4.8-.9 6.3 1.1 1.5-2 4.2-2.6 6.3-1.1 2.2 1.4 2.7 4.4.9 7.1C18.7 16.3 12 21 12 21z"/>
-      </svg>
-    `;
-
-    const answers = new Array(QUESTIONS.length).fill(null);
-
-    // 描画
-    const render = () => {
-      qWrap.innerHTML = "";
-      QUESTIONS.forEach((q,i)=>{
-        const blk = document.createElement('div'); blk.className='q';
-        const h = document.createElement('h3'); h.textContent = q.text; blk.appendChild(h);
-
-        // 横並びコンテナ
-        const scaleRow = document.createElement('div'); scaleRow.className = 'scale-row';
-
-        // 左ラベル
-        const leftLabel = document.createElement('div');
-        leftLabel.className = 'scale-label';
-        leftLabel.textContent = 'とてもそう思う';
-
-        // ハート群
-        const heartRow = document.createElement('div'); heartRow.className = 'heart-row';
-        const palette = ['var(--pink)','var(--pink)','var(--muted)','var(--teal)','var(--teal)'];
-        for(let j=0;j<5;j++){
-          const span = document.createElement('span');
-          span.className = 'heart'+(j===2?' small':'');
-          const color = getComputedStyle(document.documentElement)
-            .getPropertyValue(palette[j].replace('var(','').replace(')','')).trim() || '#ccc';
-          span.innerHTML = heart(color);
-          span.addEventListener('click',()=>{
-            answers[i]=j;
-            updateProgress();
-            highlight(i);
-          });
-          heartRow.appendChild(span);
-        }
-
-        // 右ラベル
-        const rightLabel = document.createElement('div');
-        rightLabel.className = 'scale-label';
-        rightLabel.textContent = 'まったくそう思わない';
-
-        scaleRow.appendChild(leftLabel);
-        scaleRow.appendChild(heartRow);
-        scaleRow.appendChild(rightLabel);
-        blk.appendChild(scaleRow);
-
-        qWrap.appendChild(blk);
-      });
-    };
-
-    // 選択中のハートだけ強調
-    function highlight(idx){
-      const block = qWrap.querySelectorAll('.q')[idx];
-      const hearts = block.querySelectorAll('.heart');
-      hearts.forEach((h,k)=>{
-        if(answers[idx]===k){ h.classList.add('on'); }
-        else{ h.classList.remove('on'); }
-      });
-    }
-
-    // 進捗バー
-    function updateProgress(){
-      const done = answers.filter(v=>v!==null).length;
-      const pct = Math.round(done/answers.length*100);
-      barFill.style.width = pct+'%';
-      pctText.textContent = `進捗 ${pct}%`;
-    }
-
-    render(); updateProgress();
-
-    // 送信→結果カードに切替
-    form.addEventListener('submit',(e)=>{
-      e.preventDefault();
-      formCard.classList.add('hidden');
-      resultCard.classList.remove('hidden');
-      window.scrollTo({top:0,behavior:'smooth'});
-    });
-
-    // シェア（メッセ文コピー）
-    shareBtn.addEventListener('click', async ()=>{
-      const text = '診断終わったよ！将来の奥さんは「玲華」らしい🤣';
-      try{
-        await navigator.clipboard.writeText(text);
-        shareBtn.textContent = 'コピーしたよ（スクショも送って！）';
-        setTimeout(()=> shareBtn.textContent='結果をシェア', 2200);
-      }catch{
-        alert('結果画面をスクショして送ってね！');
-      }
-    });
-
-    // もう一度
-    againBtn.addEventListener('click', ()=>{
-      answers.fill(null);
-      render(); updateProgress();
-      resultCard.classList.add('hidden');
-      formCard.classList.remove('hidden');
-      window.scrollTo({top:0,behavior:'smooth'});
-    });
-  </script>
+againBtn.addEventListener('click',()=>{
+  location.reload();
+});
+</script>
 </body>
 </html>
