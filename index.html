@@ -126,7 +126,7 @@
       width:100%;
       border-radius:16px;
       margin:18px 0;
-      box-shadow:0 6px 18px rgba(0,0,0,0.1);
+      box-shadow:0 6px 18px rgba(0, 0, 0, 0.1);
     }
     .result-name {
       font-weight:bold;
@@ -135,124 +135,151 @@
     }
     .result-text { margin-bottom:14px; }
 
-    /* SP調整 */
+    /* SP調整（既存） */
     @media (max-width:480px){
       .scale-label{font-size:12px;}
       .heart{width:30px;}
       .heart.small{width:24px;}
     }
+
+    /* === 追加: ハートが枠から出ないように＆結果名を強調 === */
+    /* ハートのはみ出し対策 */
+    .heart-row{ flex-wrap:wrap; gap:12px; }
+    .heart{ width:34px; }                 /* ベースを少しだけ小さめに */
+    .heart svg{ width:100%; height:auto; display:block; } /* span内にフィット */
+    .q{ overflow:hidden; }                 /* 念のためのガード */
+
+    @media (max-width:480px){
+      .heart{ width:26px; }
+      .heart-row{ gap:8px; }
+    }
+
+    /* 結果名（玲華）を大きく */
+    .result-tag{
+      font-size:22px;            /* 14 → 22 へUP */
+      padding:8px 20px;
+      border-radius:999px;
+      box-shadow:0 4px 14px rgba(255,182,193,.45);
+    }
+    @media (max-width:480px){
+      .result-tag{ font-size:20px; }
+    }
   </style>
 </head>
 <body>
-<img src="ChatGPT Image 2025年11月5日 00_16_31.png" alt="恋愛コアタイプ診断バナー" style="width:100%;border-radius:12px;margin-bottom:20px;">
+  <!-- 先頭バナー -->
+  <img src="ChatGPT Image 2025年11月5日 00_16_31.png" alt="恋愛コアタイプ診断バナー" style="width:100%;border-radius:12px;margin-bottom:20px;">
 
-<div class="wrap">
-  <div class="progress"><div id="barFill" class="bar"></div></div>
+  <div class="wrap">
+    <div class="progress"><div id="barFill" class="bar"></div></div>
 
-  <section id="formCard" class="card">
-    <h1>恋愛コアタイプ診断 <span class="muted">（全7問・3分）</span></h1>
-    <p class="muted">直感で選んでください。ハートをタップするだけ。</p>
-    <form id="quiz"></form>
-    <div class="actions"><button id="submitBtn">結果を見る</button></div>
-  </section>
+    <section id="formCard" class="card">
+      <h1>恋愛コアタイプ診断 <span class="muted">（全7問・3分）</span></h1>
+      <p class="muted">直感で選んでください。ハートをタップするだけ。</p>
+      <form id="quiz"></form>
+      <div class="actions"><button id="submitBtn">結果を見る</button></div>
+    </section>
 
-  <section id="resultCard" class="result-card hidden">
-    <div class="result-header">
-      <h2>あなたの将来の奥さんとしてぴったりなのは・・・</h2>
-      <span class="result-tag">玲華 💛</span>
-    </div>
-    <ul class="result-list">
-      <li>愛情深くていつもhappy</li>
-      <li>かまってあげないとたまに爆発・・・？</li>
-      <li>愛でてあげると分かりやすく上機嫌</li>
-      <li>りゅうくんのことがやけに好き</li>
-    </ul>
-    <div class="result-image">
-      <img src="IMG_5863.jpg" alt="診断結果の画像">
-    </div>
-    <p class="result-name">コールマン 玲華</p>
-    <p class="result-text">どう？？</p>
-    <div class="actions">
-      <button id="shareBtn">結果をシェア</button>
-      <button id="againBtn">もう一度やる</button>
-    </div>
-  </section>
-</div>
-
-<script>
-const QUESTIONS = [
-  {text:'恋愛では自分から追うことが多い'},
-  {text:'相手の既読や予定はできるだけ把握したい'},
-  {text:'連絡は毎日でも平気（むしろ安心する）'},
-  {text:'ケンカ後は自分から歩み寄ることが多い'},
-  {text:'相手が異性と2人で出かけるのは基本NGだ'},
-  {text:'スキンシップや言葉での愛情表現は多い方がいい'},
-  {text:'サプライズより安定した日常の方が好き'},
-];
-
-const quiz = document.getElementById('quiz');
-const bar = document.getElementById('barFill');
-const formCard = document.getElementById('formCard');
-const resultCard = document.getElementById('resultCard');
-const shareBtn = document.getElementById('shareBtn');
-const againBtn = document.getElementById('againBtn');
-
-let answers = new Array(QUESTIONS.length).fill(null);
-
-QUESTIONS.forEach((q,i)=>{
-  const blk=document.createElement('div');
-  blk.className='q';
-  blk.innerHTML=`
-    <h3>${q.text}</h3>
-    <div class="scale-row">
-      <span class="scale-label">とてもそう思う</span>
-      <div class="heart-row">
-        ${[1,2,3,4,5].map(j=>
-          `<span class="heart" data-q="${i}" data-v="${j}">
-             <svg viewBox="0 0 24 24" fill="none" stroke="${j<=3?'#fb6ea9':'#22c3b9'}" stroke-width="2">
-               <path d="M12 21s-6.9-5.7-9-9.1C1 8.5 2.9 4.2 6.5 4.1c1.9 0 3.4 1.2 4.2 2.7.8-1.5 2.3-2.7 4.2-2.7 3.6.1 5.5 4.4 3.5 7.8C18.9 15.3 12 21 12 21z"/>
-             </svg>
-           </span>`).join('')}
+    <section id="resultCard" class="result-card hidden">
+      <div class="result-header">
+        <h2>あなたの将来の奥さんとしてぴったりなのは・・・</h2>
+        <span class="result-tag">玲華 💛</span>
       </div>
-      <span class="scale-label">まったくそう思わない</span>
-    </div>`;
-  quiz.appendChild(blk);
-});
+      <ul class="result-list">
+        <li>愛情深くていつもhappy</li>
+        <li>かまってあげないとたまに爆発・・・？</li>
+        <li>愛でてあげると分かりやすく上機嫌</li>
+        <li>りゅうくんのことがやけに好き</li>
+      </ul>
+      <div class="result-image">
+        <img src="IMG_5863.jpg" alt="診断結果の画像">
+      </div>
+      <p class="result-name">コールマン 玲華</p>
+      <p class="result-text">どう？？</p>
+      <div class="actions">
+        <button id="shareBtn">結果をシェア</button>
+        <button id="againBtn">もう一度やる</button>
+      </div>
+    </section>
+  </div>
 
-document.querySelectorAll('.heart').forEach(h=>{
-  h.addEventListener('click',()=>{
-    const q = h.dataset.q;
-    answers[q] = h.dataset.v;
-    updateProgress();
-  });
-});
+  <script>
+    const QUESTIONS = [
+      {text:'恋愛では自分から追うことが多い'},
+      {text:'相手の既読や予定はできるだけ把握したい'},
+      {text:'連絡は毎日でも平気（むしろ安心する）'},
+      {text:'ケンカ後は自分から歩み寄ることが多い'},
+      {text:'相手が異性と2人で出かけるのは基本NGだ'},
+      {text:'スキンシップや言葉での愛情表現は多い方がいい'},
+      {text:'サプライズより安定した日常の方が好き'},
+    ];
 
-function updateProgress(){
-  const done = answers.filter(v=>v!=null).length;
-  const pct = Math.round(done / answers.length * 100);
-  bar.style.width = pct + '%';
-}
+    const quiz = document.getElementById('quiz');
+    const bar = document.getElementById('barFill');
+    const formCard = document.getElementById('formCard');
+    const resultCard = document.getElementById('resultCard');
+    const shareBtn = document.getElementById('shareBtn');
+    const againBtn = document.getElementById('againBtn');
 
-document.getElementById('submitBtn').addEventListener('click',(e)=>{
-  e.preventDefault();
-  formCard.classList.add('hidden');
-  resultCard.classList.remove('hidden');
-  window.scrollTo({top:0,behavior:'smooth'});
-});
+    let answers = new Array(QUESTIONS.length).fill(null);
 
-shareBtn.addEventListener('click', async ()=>{
-  const text = '診断が終わったよ！結果：コールマン玲華💛';
-  try {
-    await navigator.clipboard.writeText(text);
-    alert('結果をコピーしました！');
-  } catch {
-    alert('コピーに失敗しました');
-  }
-});
+    // 質問レンダリング
+    QUESTIONS.forEach((q,i)=>{
+      const blk=document.createElement('div');
+      blk.className='q';
+      blk.innerHTML=`
+        <h3>${q.text}</h3>
+        <div class="scale-row">
+          <span class="scale-label">とてもそう思う</span>
+          <div class="heart-row">
+            ${[1,2,3,4,5].map(j=>
+              `<span class="heart" data-q="${i}" data-v="${j}">
+                 <svg viewBox="0 0 24 24" fill="none" stroke="${j<=3?'#fb6ea9':'#22c3b9'}" stroke-width="2">
+                   <path d="M12 21s-6.9-5.7-9-9.1C1 8.5 2.9 4.2 6.5 4.1c1.9 0 3.4 1.2 4.2 2.7.8-1.5 2.3-2.7 4.2-2.7 3.6.1 5.5 4.4 3.5 7.8C18.9 15.3 12 21 12 21z"/>
+                 </svg>
+               </span>`).join('')}
+          </div>
+          <span class="scale-label">まったくそう思わない</span>
+        </div>`;
+      quiz.appendChild(blk);
+    });
 
-againBtn.addEventListener('click',()=>{
-  location.reload();
-});
-</script>
+    // クリックで回答＋進捗更新
+    document.addEventListener('click',(e)=>{
+      const t = e.target.closest('.heart');
+      if(!t) return;
+      const q = t.dataset.q;
+      answers[q] = t.dataset.v;
+      updateProgress();
+    });
+
+    function updateProgress(){
+      const done = answers.filter(v=>v!=null).length;
+      const pct = Math.round(done / answers.length * 100);
+      bar.style.width = pct + '%';
+    }
+
+    // 結果へ
+    document.getElementById('submitBtn').addEventListener('click',(e)=>{
+      e.preventDefault();
+      formCard.classList.add('hidden');
+      resultCard.classList.remove('hidden');
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+
+    // シェア（クリップボード）
+    shareBtn.addEventListener('click', async ()=>{
+      const text = '診断が終わったよ！結果：コールマン玲華💛';
+      try {
+        await navigator.clipboard.writeText(text);
+        alert('結果をコピーしました！');
+      } catch {
+        alert('コピーに失敗しました');
+      }
+    });
+
+    // もう一度
+    againBtn.addEventListener('click',()=> location.reload());
+  </script>
 </body>
 </html>
