@@ -85,7 +85,20 @@ typeName.textContent = FIXED_TYPE_NAME; // どの回答でも固定
 formCard.classList.add('hidden');
 resultCard.classList.remove('hidden');
 window.scrollTo({top:0,behavior:'smooth'});
-});
+// 診断結果の下に画像を表示
+const img = document.createElement('img');
+img.src = 'IMG_5863.png';
+img.alt = '診断結果画像';
+img.style.width = '100%';
+img.style.maxWidth = '400px';
+img.style.borderRadius = '20px';
+img.style.marginTop = '20px';
+img.style.display = 'block';
+img.style.marginLeft = 'auto';
+img.style.marginRight = 'auto';
+img.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)';
+resultCard.appendChild(img);
+
 
 
 shareBtn.addEventListener('click', async ()=>{
@@ -94,5 +107,9 @@ const text='診断終わったよ！結果：Kome（こめ）
 try{ await navigator.clipboard.writeText(text); shareBtn.textContent='コピーしました。スクショお願い！'; setTimeout(()=>shareBtn.textContent='結果をスクショして送ってね',2000);}catch{ alert('結果画面をスクショして送ってね！'); }
 });
 </script>
+<div id="resultCard" style="text-align:center;margin-top:20px;">
+<img src="IMG_5863.png" alt="診断結果画像"
+style="width:100%;max-width:400px;border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,0.1);">
+</div>
 </body>
 </html>
