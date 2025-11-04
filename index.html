@@ -68,6 +68,33 @@
     .result-title{font-size:22px;text-align:center;margin:6px 0 12px}
     .tag{display:inline-block;background:#fde68a;border-radius:10px;padding:4px 10px;margin:4px 0}
     .result-box{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fff}
+    /* ------ SP用レイアウト修正 ------ */
+@media (max-width: 480px) {
+  /* 左ラベル | ハート | 右ラベル を3カラムで固定 */
+  .scale-row{
+    display: grid !important;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    column-gap: 10px;
+    margin: 6px 0 18px;
+  }
+  .scale-label{
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;   /* 折り返し防止 */
+  }
+  /* ハートを少し小さくして幅に収める */
+  .heart{ width: 28px; }
+  .heart.small{ width: 22px; }
+}
+
+/* さらに狭い端末向けの微調整 */
+@media (max-width: 360px) {
+  .heart{ width: 24px; }
+  .heart.small{ width: 20px; }
+  .scale-label{ font-size: 11px; }
+}
+
   </style>
 </head>
 <body>
