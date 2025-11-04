@@ -1,87 +1,93 @@
 <!doctype html>
-},
-{
-text: '相手に求める“芯”は？',
-options: ['誠実さ', 'センス', '仕事への本気度']
-},
-{
-text: 'ケンカになったら？',
-options: ['その場で話して収束', '一旦クールダウンして再開', '冗談で溶かす']
-},
-{
-text: '長続きの鍵は？',
-options: ['連絡の安定感', '適度なスリル', '価値観の合致（金・生活感・速度）']
-}
-];
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>恋愛コアタイプ診断</title>
+<style>
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans JP",sans-serif;margin:0;background:#fafafa;color:#111}
+  .wrap{max-width:800px;margin:40px auto;padding:20px}
+  .card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,.05);padding:20px}
+  h1{margin:0 0 8px;font-size:24px}
+  fieldset{border:1px solid #e5e7eb;border-radius:12px;padding:12px;margin:14px 0}
+  legend{font-weight:700}
+  label{display:flex;gap:8px;align-items:flex-start;border:1px solid #e5e7eb;border-radius:10px;padding:10px;margin:6px 0;cursor:pointer}
+  button{background:#111;color:#fff;border:0;border-radius:10px;padding:12px 16px;font-weight:700;cursor:pointer}
+  .muted{color:#6b7280;font-size:12px}
+  .hidden{display:none}
+  .pill{background:#fde68a;padding:2px 8px;border-radius:8px}
+</style>
+<body>
+  <div class="wrap">
+    <div id="formCard" class="card">
+      <h1>恋愛コアタイプ診断 <span class="muted">（全7問・3分）</span></h1>
+      <p class="muted">直感で選んでください。最後にタイプを表示します。</p>
+      <form id="quiz">
+        <div id="qWrap"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+          <div class="muted">診断ID: <code>KM-01</code></div>
+          <button type="submit">結果を見る</button>
+        </div>
+      </form>
+    </div>
 
+    <div id="resultCard" class="card hidden">
+      <div class="muted">診断レポート / 2025</div>
+      <h2 style="margin:10px 0 0;font-size:22px">あなたの中核タイプ： <span id="typeName" class="pill">Kome（こめ）</span></h2>
+      <p class="muted" style="margin:8px 0 14px">落ち着きと遊び心のバランスが高い“キレ味×包容力”。</p>
+      <ul>
+        <li>強み：実務に強く、判断がブレない。</li>
+        <li>相性：大人の余裕がある人／仕事を本気でやる人。</li>
+        <li>推しデート：夜景 or ラウンジで乾杯 → 最近の勝ち話を共有。</li>
+      </ul>
+      <p style="margin-top:12px"><b>結論：</b>あなたの最適解は <b>Kome</b>。安心感とドキドキが両立。</p>
+      <button id="shareBtn" style="margin-top:14px">結果をスクショして送ってね</button>
+    </div>
+  </div>
 
-const qWrap = document.getElementById('qWrap');
-const form = document.getElementById('quiz');
-const resultCard = document.getElementById('resultCard');
-const formCard = document.getElementById('formCard');
-const typeName = document.getElementById('typeName');
-const shareBtn = document.getElementById('shareBtn');
+  <script>
+    const FIXED_TYPE_NAME = 'Kome（こめ）';
+    const QUESTIONS = [
+      {text:'初対面で惹かれるのは？',options:['刺激的なノリ','安心感のある落ち着き','予想外の一言で笑わせる人']},
+      {text:'デートプラン、理想の比率は？',options:['8:2で相手にお任せ','5:5で一緒に決めたい','2:8で自分が引っ張る']},
+      {text:'メッセのテンポ、心地よいのは？',options:['こまめにやり取り','用事ベースでサクッと','熱い時だけ濃く']},
+      {text:'一番刺さる愛情表現は？',options:['言葉','行動','共有']},
+      {text:'相手に求める“芯”は？',options:['誠実さ','センス','仕事への本気度']},
+      {text:'ケンカになったら？',options:['その場で話す','一旦クールダウン','冗談で溶かす']},
+      {text:'長続きの鍵は？',options:['連絡の安定感','適度なスリル','価値観の合致']}
+    ];
+    const qWrap=document.getElementById('qWrap');
+    const form=document.getElementById('quiz');
+    const resultCard=document.getElementById('resultCard');
+    const formCard=document.getElementById('formCard');
+    const typeName=document.getElementById('typeName');
+    const shareBtn=document.getElementById('shareBtn');
 
+    QUESTIONS.forEach((q,i)=>{
+      const fs=document.createElement('fieldset');
+      const lg=document.createElement('legend'); lg.textContent=`Q${i+1}. ${q.text}`; fs.appendChild(lg);
+      q.options.forEach((opt,j)=>{
+        const id=`q${i}_${j}`;
+        const lab=document.createElement('label'); lab.setAttribute('for',id);
+        const inp=document.createElement('input'); inp.type='radio'; inp.name=`q${i}`; inp.id=id; inp.value=j+1; inp.style.marginTop='3px';
+        const span=document.createElement('span'); span.textContent=opt;
+        lab.appendChild(inp); lab.appendChild(span); fs.appendChild(lab);
+      });
+      qWrap.appendChild(fs);
+    });
 
-// 質問を描画
-QUESTIONS.forEach((q, i) => {
-const field = document.createElement('fieldset');
-field.className = 'rounded-xl border border-slate-200 p-4';
-const legend = document.createElement('legend');
-legend.className = 'font-semibold';
-legend.textContent = `Q${i+1}. ${q.text}`;
-field.appendChild(legend);
+    form.addEventListener('submit',e=>{
+      e.preventDefault();
+      typeName.textContent = FIXED_TYPE_NAME; // どの回答でも固定
+      formCard.classList.add('hidden');
+      resultCard.classList.remove('hidden');
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
 
-
-const opts = document.createElement('div');
-opts.className = 'mt-3 grid gap-2';
-
-
-q.options.forEach((opt, j) => {
-const id = `q${i}_opt${j}`;
-const label = document.createElement('label');
-label.setAttribute('for', id);
-label.className = 'flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:border-slate-300 cursor-pointer';
-const input = document.createElement('input');
-input.type = 'radio';
-input.name = `q${i}`;
-input.id = id;
-input.value = j + 1;
-input.className = 'mt-1';
-const span = document.createElement('span');
-span.textContent = opt;
-label.appendChild(input);
-label.appendChild(span);
-opts.appendChild(label);
-});
-
-
-field.appendChild(opts);
-qWrap.appendChild(field);
-});
-
-
-form.addEventListener('submit', (e) => {
-e.preventDefault();
-// 入力バリデーション（未選択があっても通す：診断を軽く見せたい）
-typeName.textContent = FIXED_TYPE_NAME; // どの回答でも固定結果
-formCard.classList.add('hidden');
-resultCard.classList.remove('hidden');
-window.scrollTo({ top: 0, behavior: 'smooth' });
-});
-
-
-shareBtn.addEventListener('click', async () => {
-// クリップボードにメッセージをコピー（スクショ依頼を自然に）
-const text = '診断終わったよ！結果：Kome（こめ）\nスクショ送るね📸';
-try {
-await navigator.clipboard.writeText(text);
-shareBtn.textContent = 'コピーしました。スクショお願い！';
-setTimeout(()=> shareBtn.textContent='結果をスクショして送ってね', 2500);
-} catch (_) {
-alert('結果画面をスクショして送ってね！');
-}
-});
-</script>
+    shareBtn.addEventListener('click', async ()=>{
+      const text='診断終わったよ！結果：Kome（こめ）\\nスクショ送るね📸';
+      try{ await navigator.clipboard.writeText(text); shareBtn.textContent='コピーしました。スクショお願い！'; setTimeout(()=>shareBtn.textContent='結果をスクショして送ってね',2000);}
+      catch{ alert('結果画面をスクショして送ってね！');}
+    });
+  </script>
 </body>
 </html>
