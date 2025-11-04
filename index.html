@@ -1,115 +1,147 @@
 <!doctype html>
-{text:'惚れやすい方だ', A:'はい', B:'いいえ'},
-{text:'恋人がいる時は異性がいる場に行かないようにしている', A:'はい', B:'いいえ'},
-{text:'相手のテンポに合わせるのが得意だ', A:'はい', B:'いいえ'},
-{text:'連絡は安定している方が安心する', A:'はい', B:'いいえ'},
-{text:'冗談で空気を和ませるのが得意', A:'はい', B:'いいえ'},
-{text:'価値観（お金・生活・速度）が合うのが一番大事', A:'はい', B:'いいえ'},
-];
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Love Test</title>
+  <style>
+    body {
+      font-family: "Noto Sans JP", sans-serif;
+      background: #fff;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    h2 { margin-top: 20px; }
+    .hidden { display: none; }
+    .q { margin: 30px 0; }
+    .hearts {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    svg {
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      transition: transform .2s, fill .2s;
+    }
+    svg:hover { transform: scale(1.2); }
+    #bar {
+      width: 100%;
+      height: 6px;
+      background: #eee;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    #barFill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff99cc, #66ccff);
+      width: 0%;
+      transition: width .3s;
+    }
+  </style>
+</head>
+<body>
+  <div id="bar"><div id="barFill"></div></div>
+  <div id="pctText">進捗 0%</div>
 
+  <form id="quiz">
+    <div id="qWrap"></div>
+    <button type="submit">診断する</button>
+  </form>
 
-const form = document.getElementById('quiz');
-const qWrap = document.getElementById('qWrap');
-const resultCard = document.getElementById('resultCard');
-const formCard = document.getElementById('formCard');
-const typeName = document.getElementById('typeName');
-const shareBtn = document.getElementById('shareBtn');
-const barFill = document.getElementById('barFill');
-const pctText = document.getElementById('pctText');
+  <div id="resultCard" class="hidden">
+    <h2>診断結果：</h2>
+    <p id="typeName"></p>
+    <button id="shareBtn">結果をシェア</button>
+  </div>
 
+  <script>
+    const FIXED_TYPE_NAME = "Kome（こめ）";
 
-// ハートSVG（色は左右で固定）
-const heartSVG = (color) => `<?xml version="1.0"?><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke="${color}" stroke-width="2" d="M12 21s-6.7-4.6-9.2-8.1C1 10.2 1.5 7.2 3.7 5.8 5.8 4.3 8.5 4.9 10 6.9c1.5-2 4.2-2.6 6.3-1.1 2.2 1.4 2.7 4.4.9 7.1C18.7 16.3 12 21 12 21z"/></svg>`;
+    const QUESTIONS = [
+      {text:'憧れやすい方だ', A:'はい', B:'いいえ'},
+      {text:'恋人がいる時は異性がいる場に行かないようにしている', A:'はい', B:'いいえ'},
+      {text:'相手のテンションに合わせるのが得意だ', A:'はい', B:'いいえ'},
+      {text:'連絡は安定している方が安心する', A:'はい', B:'いいえ'},
+      {text:'冗談で愛情を伝えるのが得意', A:'はい', B:'いいえ'},
+      {text:'価値観（金・生活・速度）が合うのが一番大事', A:'はい', B:'いいえ'}
+    ];
 
+    const form = document.getElementById('quiz');
+    const qWrap = document.getElementById('qWrap');
+    const resultCard = document.getElementById('resultCard');
+    const formCard = document.getElementById('formCard');
+    const typeName = document.getElementById('typeName');
+    const shareBtn = document.getElementById('shareBtn');
+    const barFill = document.getElementById('barFill');
+    const pctText = document.getElementById('pctText');
 
-const answers = new Array(QUESTIONS.length).fill(null);
+    const heartSVG = (color) => `
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path fill="none" stroke="${color}" stroke-width="2"
+          d="M12 21s-6-4.4-6-9 2-8 6-8 6 3 6 8-6 9-6 9z"/>
+      </svg>`;
 
+    const answers = new Array(QUESTIONS.length).fill(null);
 
-const renderQ = () => {
-qWrap.innerHTML = '';
-QUESTIONS.forEach((q,i)=>{
-const blk = document.createElement('div'); blk.className='q';
-const h = document.createElement('h3'); h.textContent = q.text; blk.appendChild(h);
+    const renderQ = () => {
+      qWrap.innerHTML = '';
+      QUESTIONS.forEach((q, i) => {
+        const blk = document.createElement('div');
+        blk.className = 'q';
+        const h = document.createElement('h3');
+        h.textContent = q.text;
+        blk.appendChild(h);
 
+        const hearts = document.createElement('div');
+        hearts.className = 'hearts';
+        const colors = ['#ff99cc', '#ffb3d9', '#ccc', '#99e6ff', '#66ccff'];
+        colors.forEach((c, k) => {
+          const span = document.createElement('span');
+          span.innerHTML = heartSVG(c);
+          span.onclick = () => {
+            answers[i] = k;
+            updateProgress();
+          };
+          hearts.appendChild(span);
+        });
+        blk.appendChild(hearts);
+        qWrap.appendChild(blk);
+      });
+    };
 
-const row = document.createElement('div'); row.className='heart-row';
-// 5段階（左2=ピンク, 中1=小さめグレー, 右2=ティール）
-const palette = ['var(--pink)','var(--pink)','var(--muted)','var(--teal)','var(--teal)'];
-for(let j=0;j<5;j++){
-const span = document.createElement('span');
-span.className = 'heart'+(j===2?' small':'');
-span.innerHTML = heartSVG(palette[j]);
-span.setAttribute('role','radio');
-span.setAttribute('aria-checked', answers[i]===j ? 'true':'false');
-span.addEventListener('click',()=>{ answers[i]=j; updateProgress(); highlight(i); });
-row.appendChild(span);
-}
-blk.appendChild(row);
+    function updateProgress(){
+      const done = answers.filter(v => v !== null).length;
+      const pct = Math.round(done / answers.length * 100);
+      barFill.style.width = pct + '%';
+      pctText.textContent = `進捗 ${pct}%`;
+    }
 
+    renderQ();
+    updateProgress();
 
-const ab = document.createElement('div'); ab.className='ab';
-const a = document.createElement('div'); a.textContent = `A. ${q.A}`;
-const b = document.createElement('div'); b.textContent = `B. ${q.B}`;
-ab.appendChild(a); ab.appendChild(b); blk.appendChild(ab);
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      typeName.textContent = FIXED_TYPE_NAME;
+      resultCard.classList.remove('hidden');
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    });
 
-
-qWrap.appendChild(blk);
-});
-};
-
-
-function highlight(idx){
-// 選択中のハートを少し大きく
-const blocks = qWrap.querySelectorAll('.q');
-const block = blocks[idx];
-const hearts = block.querySelectorAll('.heart');
-hearts.forEach((h,k)=>{ h.style.transform = (answers[idx]===k)?'scale(1.1)':'none'; h.style.opacity = (answers[idx]===k)?'1':'.9'; });
-}
-
-
-function updateProgress(){
-const done = answers.filter(v=>v!==null).length;
-const pct = Math.round(done/answers.length*100);
-barFill.style.width = pct+'%';
-pctText.textContent = `進捗 ${pct}%`;
-}
-
-
-renderQ();
-updateProgress();
-
-
-form.addEventListener('submit', (e)=>{
-e.preventDefault();
-typeName.textContent = FIXED_TYPE_NAME; // どの回答でも固定
-formCard.classList.add('hidden');
-resultCard.classList.remove('hidden');
-window.scrollTo({top:0,behavior:'smooth'});
-// 診断結果の下に画像を表示
-const img = document.createElement('img');
-img.src = 'IMG_5863.png';
-img.alt = '診断結果画像';
-img.style.width = '100%';
-img.style.maxWidth = '400px';
-img.style.borderRadius = '20px';
-img.style.marginTop = '20px';
-img.style.display = 'block';
-img.style.marginLeft = 'auto';
-img.style.marginRight = 'auto';
-img.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)';
-resultCard.appendChild(img);
-
-
-
-shareBtn.addEventListener('click', async ()=>{
-const text='診断終わったよ！結果：Kome（こめ）
-スクショ送るね📸';
-try{ await navigator.clipboard.writeText(text); shareBtn.textContent='コピーしました。スクショお願い！'; setTimeout(()=>shareBtn.textContent='結果をスクショして送ってね',2000);}catch{ alert('結果画面をスクショして送ってね！'); }
-});
-</script>
-<div id="resultCard" style="text-align:center;margin-top:20px;">
-<img src="IMG_5863.png" alt="診断結果画像"
-style="width:100%;max-width:400px;border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,0.1);">
-</div>
+    shareBtn.addEventListener('click', async () => {
+      const text = '診断終わったよ！結果：Kome（こめ）';
+      try {
+        await navigator.clipboard.writeText(text);
+        shareBtn.textContent = 'コピーしました！スクショお願い！';
+        setTimeout(() => shareBtn.textContent = '結果をシェア', 2500);
+      } catch {
+        alert('結果画面をスクショして送ってね！');
+      }
+    });
+  </script>
 </body>
 </html>
