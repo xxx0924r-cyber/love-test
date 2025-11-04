@@ -4,26 +4,48 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>恋愛コアタイプ診断</title>
 <style>
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans JP",sans-serif;margin:0;background:#fafafa;color:#111}
-  .wrap{max-width:800px;margin:40px auto;padding:20px}
-  .card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,.05);padding:20px}
-  h1{margin:0 0 8px;font-size:24px}
-  fieldset{border:1px solid #e5e7eb;border-radius:12px;padding:12px;margin:14px 0}
-  legend{font-weight:700}
-  label{display:flex;gap:8px;align-items:flex-start;border:1px solid #e5e7eb;border-radius:10px;padding:10px;margin:6px 0;cursor:pointer}
-  button{background:#111;color:#fff;border:0;border-radius:10px;padding:12px 16px;font-weight:700;cursor:pointer}
-  .muted{color:#6b7280;font-size:12px}
+  :root{
+    --pink:#fb6ea9; --teal:#1cc4b4; --line:#e5e7eb; --text:#0f172a; --muted:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans JP",sans-serif;margin:0;background:#fafafa;color:var(--text)}
+  .wrap{max-width:880px;margin:24px auto;padding:0 18px 40px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 26px rgba(0,0,0,.05);padding:22px}
+  h1{margin:6px 0 4px;font-size:24px;text-align:center}
+  .muted{color:var(--muted);font-size:12px}
   .hidden{display:none}
+  /* progress */
+  .progress{position:sticky;top:0;background:#fff;padding:10px 0;z-index:10}
+  .bar{height:8px;border-radius:999px;background:var(--line);overflow:hidden}
+  .bar>span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--teal));transition:width .25s ease}
+  /* block */
+  .q{padding:22px 0;border-bottom:1px solid var(--line)}
+  .q:last-child{border-bottom:0}
+  .q h3{margin:0 0 10px;font-size:20px;text-align:center}
+  .ab{display:flex;justify-content:space-between;max-width:340px;margin:6px auto 0;color:var(--muted)}
+  .heart-row{display:flex;gap:14px;justify-content:center;align-items:center;margin:14px 0}
+  .heart{width:38px;cursor:pointer;opacity:.9;transition:transform .12s ease, opacity .12s ease}
+  .heart.small{width:30px}
+  .heart:hover{transform:translateY(-2px);opacity:1}
+  .heart svg{display:block}
+  .actions{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
+  button{background:#111;color:#fff;border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
   .pill{background:#fde68a;padding:2px 8px;border-radius:8px}
 </style>
 <body>
+  <div class="progress">
+    <div class="wrap" style="padding-bottom:0">
+      <div class="muted" id="pctText">進捗 0%</div>
+      <div class="bar"><span id="barFill"></span></div>
+    </div>
+  </div>
   <div class="wrap">
     <div id="formCard" class="card">
       <h1>恋愛コアタイプ診断 <span class="muted">（全7問・3分）</span></h1>
-      <p class="muted">直感で選んでください。最後にタイプを表示します。</p>
+      <p class="muted" style="text-align:center">直感で選んでください。ハートをタップするだけ。</p>
       <form id="quiz">
         <div id="qWrap"></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+        <div class="actions">
           <div class="muted">診断ID: <code>KM-01</code></div>
           <button type="submit">結果を見る</button>
         </div>
@@ -32,8 +54,8 @@
 
     <div id="resultCard" class="card hidden">
       <div class="muted">診断レポート / 2025</div>
-      <h2 style="margin:10px 0 0;font-size:22px">あなたの中核タイプ： <span id="typeName" class="pill">Kome（こめ）</span></h2>
-      <p class="muted" style="margin:8px 0 14px">落ち着きと遊び心のバランスが高い“キレ味×包容力”。</p>
+      <h2 style="margin:10px 0 0;font-size:22px;text-align:center">あなたの中核タイプ： <span id="typeName" class="pill">Kome（こめ）</span></h2>
+      <p class="muted" style="margin:8px 0 14px;text-align:center">落ち着きと遊び心のバランスが高い“キレ味×包容力”。</p>
       <ul>
         <li>強み：実務に強く、判断がブレない。</li>
         <li>相性：大人の余裕がある人／仕事を本気でやる人。</li>
@@ -46,36 +68,79 @@
 
   <script>
     const FIXED_TYPE_NAME = 'Kome（こめ）';
+    // 質問（A=「はい」, B=「いいえ」想定）
     const QUESTIONS = [
-      {text:'初対面で惹かれるのは？',options:['刺激的なノリ','安心感のある落ち着き','予想外の一言で笑わせる人']},
-      {text:'デートプラン、理想の比率は？',options:['8:2で相手にお任せ','5:5で一緒に決めたい','2:8で自分が引っ張る']},
-      {text:'メッセのテンポ、心地よいのは？',options:['こまめにやり取り','用事ベースでサクッと','熱い時だけ濃く']},
-      {text:'一番刺さる愛情表現は？',options:['言葉','行動','共有']},
-      {text:'相手に求める“芯”は？',options:['誠実さ','センス','仕事への本気度']},
-      {text:'ケンカになったら？',options:['その場で話す','一旦クールダウン','冗談で溶かす']},
-      {text:'長続きの鍵は？',options:['連絡の安定感','適度なスリル','価値観の合致']}
+      {text:'自分より大人っぽい人が好きだ', A:'はい', B:'いいえ'},
+      {text:'惚れやすい方だ', A:'はい', B:'いいえ'},
+      {text:'恋人がいる時は異性がいる場に行かないようにしている', A:'はい', B:'いいえ'},
+      {text:'相手のテンポに合わせるのが得意だ', A:'はい', B:'いいえ'},
+      {text:'連絡は安定している方が安心する', A:'はい', B:'いいえ'},
+      {text:'冗談で空気を和ませるのが得意', A:'はい', B:'いいえ'},
+      {text:'価値観（お金・生活・速度）が合うのが一番大事', A:'はい', B:'いいえ'},
     ];
-    const qWrap=document.getElementById('qWrap');
-    const form=document.getElementById('quiz');
-    const resultCard=document.getElementById('resultCard');
-    const formCard=document.getElementById('formCard');
-    const typeName=document.getElementById('typeName');
-    const shareBtn=document.getElementById('shareBtn');
 
-    QUESTIONS.forEach((q,i)=>{
-      const fs=document.createElement('fieldset');
-      const lg=document.createElement('legend'); lg.textContent=`Q${i+1}. ${q.text}`; fs.appendChild(lg);
-      q.options.forEach((opt,j)=>{
-        const id=`q${i}_${j}`;
-        const lab=document.createElement('label'); lab.setAttribute('for',id);
-        const inp=document.createElement('input'); inp.type='radio'; inp.name=`q${i}`; inp.id=id; inp.value=j+1; inp.style.marginTop='3px';
-        const span=document.createElement('span'); span.textContent=opt;
-        lab.appendChild(inp); lab.appendChild(span); fs.appendChild(lab);
+    const form = document.getElementById('quiz');
+    const qWrap = document.getElementById('qWrap');
+    const resultCard = document.getElementById('resultCard');
+    const formCard = document.getElementById('formCard');
+    const typeName = document.getElementById('typeName');
+    const shareBtn = document.getElementById('shareBtn');
+    const barFill = document.getElementById('barFill');
+    const pctText = document.getElementById('pctText');
+
+    // ハートSVG（色は左右で固定）
+    const heartSVG = (color) => `<?xml version="1.0"?><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke="${color}" stroke-width="2" d="M12 21s-6.7-4.6-9.2-8.1C1 10.2 1.5 7.2 3.7 5.8 5.8 4.3 8.5 4.9 10 6.9c1.5-2 4.2-2.6 6.3-1.1 2.2 1.4 2.7 4.4.9 7.1C18.7 16.3 12 21 12 21z"/></svg>`;
+
+    const answers = new Array(QUESTIONS.length).fill(null);
+
+    const renderQ = () => {
+      qWrap.innerHTML = '';
+      QUESTIONS.forEach((q,i)=>{
+        const blk = document.createElement('div'); blk.className='q';
+        const h = document.createElement('h3'); h.textContent = q.text; blk.appendChild(h);
+
+        const row = document.createElement('div'); row.className='heart-row';
+        // 5段階（左2=ピンク, 中1=小さめグレー, 右2=ティール）
+        const palette = ['var(--pink)','var(--pink)','var(--muted)','var(--teal)','var(--teal)'];
+        for(let j=0;j<5;j++){
+          const span = document.createElement('span');
+          span.className = 'heart'+(j===2?' small':'');
+          span.innerHTML = heartSVG(palette[j]);
+          span.setAttribute('role','radio');
+          span.setAttribute('aria-checked', answers[i]===j ? 'true':'false');
+          span.addEventListener('click',()=>{ answers[i]=j; updateProgress(); highlight(i); });
+          row.appendChild(span);
+        }
+        blk.appendChild(row);
+
+        const ab = document.createElement('div'); ab.className='ab';
+        const a = document.createElement('div'); a.textContent = `A. ${q.A}`;
+        const b = document.createElement('div'); b.textContent = `B. ${q.B}`;
+        ab.appendChild(a); ab.appendChild(b); blk.appendChild(ab);
+
+        qWrap.appendChild(blk);
       });
-      qWrap.appendChild(fs);
-    });
+    };
 
-    form.addEventListener('submit',e=>{
+    function highlight(idx){
+      // 選択中のハートを少し大きく
+      const blocks = qWrap.querySelectorAll('.q');
+      const block = blocks[idx];
+      const hearts = block.querySelectorAll('.heart');
+      hearts.forEach((h,k)=>{ h.style.transform = (answers[idx]===k)?'scale(1.1)':'none'; h.style.opacity = (answers[idx]===k)?'1':'.9'; });
+    }
+
+    function updateProgress(){
+      const done = answers.filter(v=>v!==null).length;
+      const pct = Math.round(done/answers.length*100);
+      barFill.style.width = pct+'%';
+      pctText.textContent = `進捗 ${pct}%`;
+    }
+
+    renderQ();
+    updateProgress();
+
+    form.addEventListener('submit', (e)=>{
       e.preventDefault();
       typeName.textContent = FIXED_TYPE_NAME; // どの回答でも固定
       formCard.classList.add('hidden');
@@ -84,9 +149,9 @@
     });
 
     shareBtn.addEventListener('click', async ()=>{
-      const text='診断終わったよ！結果：Kome（こめ）\\nスクショ送るね📸';
-      try{ await navigator.clipboard.writeText(text); shareBtn.textContent='コピーしました。スクショお願い！'; setTimeout(()=>shareBtn.textContent='結果をスクショして送ってね',2000);}
-      catch{ alert('結果画面をスクショして送ってね！');}
+      const text='診断終わったよ！結果：Kome（こめ）
+スクショ送るね📸';
+      try{ await navigator.clipboard.writeText(text); shareBtn.textContent='コピーしました。スクショお願い！'; setTimeout(()=>shareBtn.textContent='結果をスクショして送ってね',2000);}catch{ alert('結果画面をスクショして送ってね！'); }
     });
   </script>
 </body>
