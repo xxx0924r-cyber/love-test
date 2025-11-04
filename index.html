@@ -94,6 +94,84 @@
   .heart.small{ width: 20px; }
   .scale-label{ font-size: 11px; }
 }
+/* 結果ページデザイン */
+.result-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 28px 24px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  text-align: center;
+  margin: 30px auto;
+  max-width: 600px;
+}
+
+.result-header h2 {
+  font-size: 20px;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.result-tag {
+  display: inline-block;
+  background: linear-gradient(90deg, #ffb6c1, #ffd700);
+  color: #fff;
+  font-weight: bold;
+  padding: 6px 16px;
+  border-radius: 50px;
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+
+.result-list {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 18px 0;
+  text-align: left;
+  list-style-type: "💗 ";
+}
+
+.result-image img {
+  width: 100%;
+  border-radius: 16px;
+  margin: 18px 0;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+.result-name {
+  font-weight: bold;
+  margin-top: 6px;
+  font-size: 16px;
+}
+
+.result-text {
+  font-size: 15px;
+  color: #444;
+  margin-bottom: 14px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+button {
+  background: #ff8fab;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 30px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: #ff5f87;
+}
 
   </style>
 </head>
@@ -123,7 +201,32 @@
     </section>
 
     <!-- 結果カード -->
-    <section id="resultCard" class="card hidden">
+    <section id="resultCard" class="result-card hidden">
+  <div class="result-header">
+    <h2>あなたの将来の奥さんとしてぴったりなのは・・・</h2>
+    <span class="result-tag">玲華 💛</span>
+  </div>
+
+  <ul class="result-list">
+    <li>愛情深くていつもhappy</li>
+    <li>かまってあげないとたまに爆発・・・？</li>
+    <li>愛でてあげると分かりやすく上機嫌</li>
+    <li>りゅうくんのことがやけに好き</li>
+  </ul>
+
+  <div class="result-image">
+    <img src="IMG_5863.jpg" alt="診断結果の画像">
+  </div>
+
+  <div class="result-footer">
+    <p class="result-name">コールマン 玲華</p>
+    <p class="result-text">どう？？</p>
+    <div class="buttons">
+      <button id="shareBtn">結果をシェア</button>
+      <button id="againBtn">もう一度やる</button>
+    </div>
+  </div>
+</section>
       <div class="muted">診断レポート / 2025</div>
       <h2 class="result-title">あなたの将来の奥さんとしてぴったりなのは・・・</h2>
       <div class="center"><span class="tag">玲華！</span></div>
